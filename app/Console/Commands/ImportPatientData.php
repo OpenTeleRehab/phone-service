@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\ApiHelper;
 use App\Models\Phone;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -13,7 +14,7 @@ class ImportPatientData extends Command
      *
      * @var string
      */
-    protected $signature = 'hi:import-patient-data';
+    protected $signature = 'hi:import-patient-data {stage : (local, demo, live)}';
 
     /**
      * The console command description.
@@ -27,7 +28,7 @@ class ImportPatientData extends Command
      *
      * @var string
      */
-    protected $help = 'php artisan hi:import-patient-data';
+    protected $help = 'php artisan hi:import-patient-data local';
 
     /**
      * Execute the console command.
@@ -38,29 +39,29 @@ class ImportPatientData extends Command
     {
         $hosts = config('settings.hosting_country');
         $response = Http::get(env('GADMIN_SERVICE_URL') . '/get-org-by-name', ['orgName' => 'Humanity Inclusion']);
-        if ($response->successful()) {
-            $org = $response->json();
+        $stage = $this->argument('stage');
 
-            // Get patient from global to phone service
+        if ($response->successful()) {
+            // Get patient from global to phone service.
             $patientData = json_decode(Http::get(env('PATIENT_SERVICE_URL') . '/patient/list/data-for-phone-service'));
-            $patientApiUrl = 'https://' . $org['sub_domain_name'] . '-patient.' . $patientData->domain . '/api/patient';
-            $adminApiUrl = 'https://' . $org['sub_domain_name'] . '-admin.' . $patientData->domain . '/api/admin';
-            $therapistApiUrl = 'https://' . $org['sub_domain_name'] . '-therapist.' . $patientData->domain . '/api/therapist';
-            $chatApiUrl = 'https://' . $org['sub_domain_name'] . '-chat.' . $patientData->domain;
-            $chatWebsocketUrl = 'wss://' . $org['sub_domain_name'] . '-chat.' . $patientData->domain . '/websocket';
-            foreach ($patientData->data as $patient) {
-                Phone::create(
-                    [
-                        'phone' => $patient->phone,
-                        'organization_name' => 'Humanity Inclusion',
-                        'patient_api_url' => $patientApiUrl,
-                        'admin_api_url' => $adminApiUrl,
-                        'therapist_api_url' => $therapistApiUrl,
-                        'chat_api_url' => $chatApiUrl,
-                        'chat_websocket_url' => $chatWebsocketUrl,
-                        'clinic_id' => $patient->clinic_id,
-                    ]
-                );
+
+            if (!empty($patientData)) {
+                $domain = $patientData->domain;
+
+                foreach ($patientData->data as $patient) {
+                    Phone::create(
+                        [
+                            'phone' => $patient->phone,
+                            'organization_name' => 'Humanity Inclusion',
+                            'patient_api_url' => ApiHelper::createApiUrl($stage, 'patient', $domain),
+                            'admin_api_url' => ApiHelper::createApiUrl($stage, 'admin', $domain),
+                            'therapist_api_url' => ApiHelper::createApiUrl($stage, 'therapist', $domain),
+                            'chat_api_url' => ApiHelper::createApiUrl($stage, 'chat', $domain),
+                            'chat_websocket_url' => ApiHelper::createApiUrl($stage, 'websocket', $domain),
+                            'clinic_id' => $patient->clinic_id,
+                        ]
+                    );
+                }
             }
 
             // Get patient from vn db or other country to phone service
@@ -68,22 +69,30 @@ class ImportPatientData extends Command
                 $patientData = json_decode(Http::withHeaders([
                     'country' => $host
                 ])->get(env('PATIENT_SERVICE_URL') . '/patient/list/data-for-phone-service'));
-                foreach ($patientData->data as $patient) {
-                    Phone::create(
-                        [
-                            'phone' => $patient->phone,
-                            'organization_name' => 'Humanity Inclusion',
-                            'patient_api_url' => $patientApiUrl,
-                            'admin_api_url' => $adminApiUrl,
-                            'therapist_api_url' => $therapistApiUrl,
-                            'chat_api_url' => $chatApiUrl,
-                            'chat_websocket_url' => $chatWebsocketUrl,
-                            'clinic_id' => $patient->clinic_id,
-                        ]
-                    );
+
+                if (!empty($patientData)) {
+                    $domain = $patientData->domain;
+
+                    foreach ($patientData->data as $patient) {
+                        Phone::create(
+                            [
+                                'phone' => $patient->phone,
+                                'organization_name' => 'Humanity Inclusion',
+                                'patient_api_url' => ApiHelper::createApiUrl($stage, 'patient', $domain),
+                                'admin_api_url' => ApiHelper::createApiUrl($stage, 'admin', $domain),
+                                'therapist_api_url' => ApiHelper::createApiUrl($stage, 'therapist', $domain),
+                                'chat_api_url' => ApiHelper::createApiUrl($stage, 'chat', $domain),
+                                'chat_websocket_url' => ApiHelper::createApiUrl($stage, 'websocket', $domain),
+                                'clinic_id' => $patient->clinic_id,
+                            ]
+                        );
+                    }
                 }
             }
         }
+
         $this->info('Patient data has been imported successfully');
+
+        return 0;
     }
 }

@@ -14,7 +14,7 @@ class PhoneController extends Controller
      */
     public function getPhone(Request $request)
     {
-        $phone = Phone::where('phone', $request->get('phone'))->first();
+        $phone = Phone::where('phone', $request->get('phone'))->firstOrFail();
         return ['success' => true, 'data' => $phone];
     }
 
