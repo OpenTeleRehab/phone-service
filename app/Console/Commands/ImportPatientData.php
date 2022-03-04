@@ -38,13 +38,13 @@ class ImportPatientData extends Command
     public function handle()
     {
         $hosts = config('settings.hosting_country');
-        $response = Http::get(env('GADMIN_SERVICE_URL') . '/get-org-by-name', ['orgName' => 'Humanity Inclusion']);
+        $response = Http::get(env('GADMIN_SERVICE_URL') . '/get-organization', ['sub_domain' => 'hi']);
         $stage = $this->argument('stage');
 
         if ($response->successful()) {
             // Get patient from global to phone service.
             $patientData = json_decode(Http::get(env('PATIENT_SERVICE_URL') . '/patient/list/data-for-phone-service'));
-
+            $org = $response->json();
             if (!empty($patientData)) {
                 $domain = $patientData->domain;
 
@@ -52,13 +52,14 @@ class ImportPatientData extends Command
                     Phone::create(
                         [
                             'phone' => $patient->phone,
-                            'organization_name' => 'Humanity Inclusion',
+                            'organization_name' => $org['name'],
                             'patient_api_url' => ApiHelper::createApiUrl($stage, 'patient', $domain),
                             'admin_api_url' => ApiHelper::createApiUrl($stage, 'admin', $domain),
                             'therapist_api_url' => ApiHelper::createApiUrl($stage, 'therapist', $domain),
                             'chat_api_url' => ApiHelper::createApiUrl($stage, 'chat', $domain),
                             'chat_websocket_url' => ApiHelper::createApiUrl($stage, 'websocket', $domain),
                             'clinic_id' => $patient->clinic_id,
+                            'sub_domain' => $org['sub_domain_name'],
                         ]
                     );
                 }
@@ -77,13 +78,14 @@ class ImportPatientData extends Command
                         Phone::create(
                             [
                                 'phone' => $patient->phone,
-                                'organization_name' => 'Humanity Inclusion',
+                                'organization_name' => $org['name'],
                                 'patient_api_url' => ApiHelper::createApiUrl($stage, 'patient', $domain),
                                 'admin_api_url' => ApiHelper::createApiUrl($stage, 'admin', $domain),
                                 'therapist_api_url' => ApiHelper::createApiUrl($stage, 'therapist', $domain),
                                 'chat_api_url' => ApiHelper::createApiUrl($stage, 'chat', $domain),
                                 'chat_websocket_url' => ApiHelper::createApiUrl($stage, 'websocket', $domain),
                                 'clinic_id' => $patient->clinic_id,
+                                'sub_domain' => $org['sub_domain_name'],
                             ]
                         );
                     }

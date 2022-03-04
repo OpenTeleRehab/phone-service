@@ -23,5 +23,6 @@ class Phone extends Model
         'chat_api_url',
         'chat_websocket_url',
         'clinic_id',
+        'sub_domain',
     ];
 }

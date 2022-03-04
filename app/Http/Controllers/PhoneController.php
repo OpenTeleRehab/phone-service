@@ -27,6 +27,7 @@ class PhoneController extends Controller
     {
         $phone = $request->get('phone');
         $orgName = $request->get('org_name');
+        $orgSubDomain = $request->get('sub_domain');
         $patientApiUrl = $request->get('patient_api_url');
         $adminApiUrl = $request->get('admin_api_url');
         $therapistApiUrl = $request->get('therapist_api_url');
@@ -43,6 +44,7 @@ class PhoneController extends Controller
                 'chat_api_url' => $chatApiUrl,
                 'chat_websocket_url' => $chatWebsocketUrl,
                 'clinic_id' => $clinicId,
+                'sub_domain' => $orgSubDomain,
             ]
         );
         return ['success' => true, 'message' => 'success_message.phone_add'];
@@ -80,9 +82,9 @@ class PhoneController extends Controller
      */
     public function getPhoneByOrg(Request $request)
     {
-        $org = $request->get('org_name');
+        $subDomain = $request->get('sub_domain');
         $phone = $request->get('phone');
-        $data = Phone::where('organization_name', $org)->where('phone', $phone)->first();
+        $data = Phone::where('sub_domain', $subDomain)->where('phone', $phone)->first();
         return ['success' => true, 'data' => $data];
     }
 }
