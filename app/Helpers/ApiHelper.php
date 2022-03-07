@@ -26,7 +26,7 @@ class ApiHelper
                     $apiUrl = 'https://' . $stage . '-hi-chat.' . $domain;
                     break;
                 } else {
-                    $apiUrl = 'https://' . $stage . '-hi-' . $apiName . '.' . $domain . '/api/' . $apiName;
+                    $apiUrl = 'https://' . $stage . '-hi-admin' . '.' . $domain . '/api/' . $apiName;
                     break;
                 }
             case 'demo':
@@ -37,7 +37,7 @@ class ApiHelper
                     $apiUrl = 'https://' . $stage . '-chat-' . $domain;
                     break;
                 } else {
-                    $apiUrl = 'https://' . $stage . '-' . $apiName . '-' . $domain . '/api/' . $apiName;
+                    $apiUrl = 'https://' . $stage . '-admin' . '-' . $domain . '/api/' . $apiName;
                     break;
                 }
             case 'live':
@@ -48,7 +48,7 @@ class ApiHelper
                     $apiUrl = 'https://' . 'chat.' . $domain;
                     break;
                 } else {
-                    $apiUrl = 'https://' . $apiName . '.' . $domain . '/api/' . $apiName;
+                    $apiUrl = 'https://' . 'admin.' . $domain . '/api/' . $apiName;
                     break;
                 }
             default:
