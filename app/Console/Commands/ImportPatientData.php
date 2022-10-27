@@ -49,9 +49,9 @@ class ImportPatientData extends Command
                 $domain = $patientData->domain;
 
                 foreach ($patientData->data as $patient) {
-                    Phone::create(
+                    Phone::updateOrCreate(
+                        ['phone' => $patient->phone],
                         [
-                            'phone' => $patient->phone,
                             'organization_name' => $org['name'],
                             'patient_api_url' => ApiHelper::createApiUrl($stage, 'patient', $domain),
                             'admin_api_url' => ApiHelper::createApiUrl($stage, 'admin', $domain),
