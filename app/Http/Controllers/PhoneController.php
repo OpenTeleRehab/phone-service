@@ -87,4 +87,21 @@ class PhoneController extends Controller
         $data = Phone::where('sub_domain', $subDomain)->where('phone', $phone)->first();
         return ['success' => true, 'data' => $data];
     }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function deleteByClinicId(Request $request)
+    {
+        $clinicId = $request->get('clinic_id');
+        $phones = Phone::where('clinic_id', $clinicId)->get();
+        if (count($phones) > 0) {
+            foreach ($phones as $phone) {
+                $phone->delete();
+            }
+        }
+
+        return ['success' => true, 'message' => 'success_message.deleted_account'];
+    }
 }
