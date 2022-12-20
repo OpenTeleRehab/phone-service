@@ -17,3 +17,4 @@ use Illuminate\Support\Facades\Route;
 Route::apiResource('phone', PhoneController::class);
 Route::get('get-phone', [PhoneController::class, 'getPhone']);
 Route::get('get-phone-by-org', [PhoneController::class, 'getPhoneByOrg']);
+Route::post('phone/delete/by-clinic', [PhoneController::class, 'deleteByClinicId']);
