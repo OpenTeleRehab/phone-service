@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class PhoneController extends Controller
 {
     /**
-     * @param \GuzzleHttp\Psr7\Request $request
+     * @param  \Illuminate\Http\Request $request
      *
      * @return mixed
      */
@@ -19,7 +19,7 @@ class PhoneController extends Controller
     }
 
     /**
-     * @param \GuzzleHttp\Psr7\Request $request
+     * @param  \Illuminate\Http\Request $request
      *
      * @return array
      */
